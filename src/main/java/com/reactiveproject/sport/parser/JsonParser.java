@@ -32,15 +32,16 @@ public class JsonParser {
                     .map(this::convertStringToJasonObjectList)
                     .flatMapMany(Flux::fromIterable)
                     .map(this::parseJsonToSport)
-                    .delayElements(Duration.ofMillis(1000))
-                    .doOnNext(dataManager::saveData);
+                   // .delayElements(Duration.ofMillis(500))
+                    .flatMap(dataManager::persistToDB);
+
         }
 
         private Sport parseJsonToSport(JSONObject data) {
             long id=(long)data.get("id");
             JSONObject attributes=(JSONObject)data.get("attributes");
             String name=(String)attributes.get("name");
-            Sport sport=new Sport(id,name);
+            Sport sport=new Sport(id,name).setAsNew();
             return sport;
         }
 

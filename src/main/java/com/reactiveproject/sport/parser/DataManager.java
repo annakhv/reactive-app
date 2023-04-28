@@ -2,19 +2,20 @@ package com.reactiveproject.sport.parser;
 
 import com.reactiveproject.sport.model.Sport;
 import com.reactiveproject.sport.repository.SportRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DataManager {
 
     private final SportRepository repository;
 
-    public Mono<Sport> saveData(Sport sport) {
-        return repository.findById(sport.getId())
-                .switchIfEmpty(repository.save(sport));
+    public Mono<Sport> persistToDB(Sport sport) {;
+       return repository.findById(sport.getId())
+               .log()
+               .switchIfEmpty(repository.save(sport));
     }
 
 

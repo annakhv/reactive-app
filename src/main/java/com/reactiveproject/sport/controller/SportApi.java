@@ -17,18 +17,18 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/sport")
 @RestController
 @AllArgsConstructor
-public class sport {
+public class SportApi {
 
     private final SportRepository repository;
     private final JsonParser jsonParser;
 
 
     //test api
-    @GetMapping("/{id}")
-    public Mono<Sport> getName(@PathVariable long id) {
-        return repository.findById(id).defaultIfEmpty(new Sport(100, "basketball"));
-
+    @GetMapping("/{id}/{sport}")
+    public Mono<Sport> getName(@PathVariable long id,@PathVariable String sport) {
+       return repository.save(new Sport(id,sport).setAsNew()).switchIfEmpty(Mono.just(new Sport(100l, "basketball")));
     }
+
     @GetMapping("/data")
     public Flux<String> getData() {
         return jsonParser.parseJsonToObj()
