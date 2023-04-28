@@ -2,11 +2,9 @@ package com.reactiveproject.sport.controller;
 
 
 import com.reactiveproject.sport.model.Sport;
+import com.reactiveproject.sport.parser.JsonParser;
 import com.reactiveproject.sport.repository.SportRepository;
-import com.reactiveproject.sport.service.ExternalService;
 import lombok.AllArgsConstructor;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,13 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+
 @RequestMapping("/sport")
 @RestController
 @AllArgsConstructor
 public class sport {
 
     private final SportRepository repository;
-    private final ExternalService externalService;
+    private final JsonParser jsonParser;
 
 
     //test api
@@ -30,8 +30,9 @@ public class sport {
 
     }
     @GetMapping("/data")
-    public Flux<JSONArray> getData() {
-        return externalService.getSportData();
+    public Flux<String> getData() {
+        return jsonParser.parseJsonToObj()
+                .map(elem-> " [ element "+elem+ " is successfully saved in db ]");
     }
 
 }

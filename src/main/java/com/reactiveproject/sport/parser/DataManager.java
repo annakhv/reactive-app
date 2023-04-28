@@ -12,8 +12,9 @@ public class DataManager {
 
     private final SportRepository repository;
 
-    public Mono<Sport> saveData(Sport sport){
-       return repository.save(sport);
+    public Mono<Sport> saveData(Sport sport) {
+        return repository.findById(sport.getId())
+                .switchIfEmpty(repository.save(sport));
     }
 
 
