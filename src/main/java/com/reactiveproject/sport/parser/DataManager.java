@@ -14,7 +14,6 @@ public class DataManager {
 
     public Mono<Sport> persistToDB(Sport sport) {;
        return repository.findById(sport.getId())
-               .log()
                .switchIfEmpty(repository.save(sport));
     }
 
