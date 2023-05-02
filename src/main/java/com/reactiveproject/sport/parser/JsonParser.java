@@ -11,6 +11,7 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -26,35 +27,35 @@ public class JsonParser {
 
     public Flux<Sport> parseJsonToObj() {
         return externalService.getSportData()
-                .map(this::convertBufferToString)
+                .flatMap(this::convertBufferToString)
                 .collect(Collectors.joining())
-                .map(this::convertStringToJasonObjectList)
+                .flatMap(this::convertStringToJasonObjectList)
                 .flatMapMany(Flux::fromIterable)
-                .map(this::parseJsonToSport)
+                .flatMap(this::parseJsonToSport)
                 .flatMap(dataManager::persistToDB);
 
     }
 
-    private Sport parseJsonToSport(JSONObject data) {
+    private Mono<Sport> parseJsonToSport(JSONObject data) {
         long id = (long) data.get("id");
         JSONObject attributes = (JSONObject) data.get("attributes");
         String name = (String) attributes.get("name");
         Sport sport = new Sport(id, name).setAsNew();
-        return sport;
+        return Mono.just(sport);
     }
 
-    private String convertBufferToString(DataBuffer dataBuffer) {
+    private Mono<String> convertBufferToString(DataBuffer dataBuffer) {
         byte[] bytes = new byte[dataBuffer.readableByteCount()];
         dataBuffer.read(bytes);
         DataBufferUtils.release(dataBuffer);
-        return new String(bytes, StandardCharsets.UTF_8);
+        return Mono.just(new String(bytes, StandardCharsets.UTF_8));
     }
 
-    private List<JSONObject> convertStringToJasonObjectList(String data) {
+    private Mono<List<JSONObject>> convertStringToJasonObjectList(String data) {
         try {
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(data);
             JSONArray array = (JSONArray) jsonObject.get("data");
-            return IntStream.range(0, array.size()).boxed().map(i -> (JSONObject) array.get(i)).toList();
+            return Mono.just(IntStream.range(0, array.size()).parallel().boxed().map(i -> (JSONObject) array.get(i)).toList());
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

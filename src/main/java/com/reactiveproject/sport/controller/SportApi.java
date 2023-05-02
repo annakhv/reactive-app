@@ -8,9 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.BaseSubscriber;
-import reactor.core.publisher.Flux;
-
-import java.util.List;
 
 
 @RequestMapping("/sport")
@@ -31,21 +28,19 @@ public class SportApi {
                     @Override
                     protected void hookOnSubscribe(Subscription subscription) {
                         System.out.println("subscribed 20 items");
-                       subscription.request(20);
+                        subscription.request(20);
                     }
+
                     @Override
                     protected void hookOnNext(String value) {
                         System.out.println("received 20 items");
                         request(20);
                     }
+
                 });
 
 
-
-
-
     }
-
 
 
 }

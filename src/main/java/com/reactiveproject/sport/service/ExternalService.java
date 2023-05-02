@@ -1,16 +1,13 @@
 package com.reactiveproject.sport.service;
 
 import lombok.AllArgsConstructor;
-import org.reactivestreams.Subscription;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
-import java.util.List;
+import java.time.Duration;
 
 @Service
 @AllArgsConstructor
@@ -23,7 +20,8 @@ public class ExternalService {
                 .uri("/sports")
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .bodyToFlux(DataBuffer.class);
+                .bodyToFlux(DataBuffer.class)
+                .delayElements(Duration.ofMillis(500));
 
     }
 }
